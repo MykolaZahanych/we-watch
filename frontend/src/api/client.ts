@@ -46,9 +46,9 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = getAuthToken();
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
 
   if (token) {
@@ -63,7 +63,7 @@ async function apiRequest<T>(
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || data.message || 'An error occurred');
+    throw new Error(data.error);
   }
 
   return data;
