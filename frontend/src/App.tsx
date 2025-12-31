@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { getAuthToken, removeAuthToken } from '@/api/client';
+import { getAuthToken } from '@/api';
 import LoginForm from '@/components/authentication/LoginForm';
 import RegisterForm from '@/components/authentication/RegisterForm';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import MovieList from '@/components/movies/MovieList';
+import Layout from '@/components/layout/Layout';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
@@ -14,27 +14,15 @@ function App() {
   };
 
   const handleLogout = () => {
-    removeAuthToken();
     setIsAuthenticated(false);
     setShowLogin(true);
   };
 
   if (isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>We Watch</CardTitle>
-            <CardDescription>Your shared movie watchlist app</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Welcome! You're logged in.</p>
-            <Button onClick={handleLogout} variant="destructive" className="w-full">
-              Logout
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <Layout onLogout={handleLogout}>
+        <MovieList />
+      </Layout>
     );
   }
 

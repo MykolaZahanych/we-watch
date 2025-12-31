@@ -1,33 +1,6 @@
 const API_BASE_URL = '/api';
 
-export interface RegisterData {
-  email: string;
-  password: string;
-  repeatPassword: string;
-  nickname: string;
-}
-
-export interface LoginData {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  message: string;
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    nickname: string;
-  };
-}
-
-export interface ApiError {
-  error: string;
-  message?: string;
-}
-
-// Store token in localStorage
+// Token management utilities
 export const setAuthToken = (token: string) => {
   localStorage.setItem('authToken', token);
 };
@@ -40,8 +13,7 @@ export const removeAuthToken = () => {
   localStorage.removeItem('authToken');
 };
 
-// API client with error handling
-async function apiRequest<T>(
+export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -68,21 +40,3 @@ async function apiRequest<T>(
 
   return data;
 }
-
-// Auth API functions
-export const authApi = {
-  register: async (data: RegisterData): Promise<AuthResponse> => {
-    return apiRequest<AuthResponse>('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-
-  login: async (data: LoginData): Promise<AuthResponse> => {
-    return apiRequest<AuthResponse>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-};
-

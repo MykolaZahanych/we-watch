@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { authApi, setAuthToken, LoginData } from '@/api/client';
+import { authApi, setAuthToken } from '@/api';
+import type { LoginData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
