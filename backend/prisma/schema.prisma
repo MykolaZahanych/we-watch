@@ -13,8 +13,32 @@ model User {
   nickname     String   @db.VarChar(100)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+  movies       Movie[]
 
   @@index([email])
   @@map("users")
+}
+
+enum MovieStatus {
+  NEED_TO_WATCH
+  COMPLETED
+  REJECTED
+}
+
+model Movie {
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar(255)
+  link      String      @db.Text
+  comments  String?     @db.Text
+  rating    Int?        @db.SmallInt
+  status    MovieStatus
+  userId    Int         @map("user_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("movies")
 }
 

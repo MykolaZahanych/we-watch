@@ -10,7 +10,10 @@
     "paths": {
       "@utils/*": ["utils/*"],
       "@db/*": ["db/*"],
-      "@routes/*": ["routes/*"]
+      "@routes/*": ["routes/*"],
+      "@middleware/*": ["middleware/*"],
+      "@constants/*": ["constants/*"],
+      "@types/*": ["types/*"]
     },
     "strict": true,
     "esModuleInterop": true,

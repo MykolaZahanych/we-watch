@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { prisma } from '@db/client.js';
 import { generateToken } from '@utils/jwt.js';
+import { sendErrorResponse, HttpStatus } from '@utils/response.js';
 
 const router = Router();
 
@@ -10,15 +11,11 @@ router.post('/register', async (req: Request, res: Response) => {
     const { email, password, repeatPassword, nickname } = req.body;
 
     if (!email || !password || !repeatPassword || !nickname) {
-      return res.status(400).json({
-        error: 'All fields are required',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'All fields are required');
     }
 
     if (password !== repeatPassword) {
-      return res.status(400).json({
-        error: 'Passwords do not match',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Passwords do not match');
     }
 
     // Password validation: at least 8 characters, one number, one special character
@@ -27,18 +24,14 @@ router.post('/register', async (req: Request, res: Response) => {
     const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
 
     if (!hasMinLength || !hasNumber || !hasSpecialChar) {
-      return res.status(400).json({
-        error:
-          'Password must be at least 8 characters long, contain at least one number, and contain at least one special character',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST,
+        'Password must be at least 8 characters long, contain at least one number, and contain at least one special character');
     }
 
     // Email validation (basic)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        error: 'Invalid email format',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Invalid email format');
     }
 
     // Check if user already exists
@@ -47,9 +40,7 @@ router.post('/register', async (req: Request, res: Response) => {
     });
 
     if (existingUser) {
-      return res.status(400).json({
-        error: 'User with this email already exists',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'User with this email already exists');
     }
 
     // Hash password
@@ -83,9 +74,7 @@ router.post('/register', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({
-      error: 'Failed to register user',
-    });
+    return sendErrorResponse(res, HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to register user');
   }
 });
 
@@ -94,9 +83,7 @@ router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        error: 'Email and password are required',
-      });
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Email and password are required');
     }
 
     const user = await prisma.user.findUnique({
@@ -104,17 +91,13 @@ router.post('/login', async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return res.status(401).json({
-        error: 'Invalid email or password',
-      });
+      return sendErrorResponse(res, HttpStatus.UNAUTHORIZED, 'Invalid email or password');
     }
 
     const isValidPassword = await bcrypt.compare(password, user.passwordHash);
 
     if (!isValidPassword) {
-      return res.status(401).json({
-        error: 'Invalid email or password',
-      });
+      return sendErrorResponse(res, HttpStatus.UNAUTHORIZED, 'Invalid email or password');
     }
 
     const token = generateToken({
@@ -134,9 +117,7 @@ router.post('/login', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({
-      error: 'Failed to login',
-    });
+    return sendErrorResponse(res, HttpStatus.INTERNAL_SERVER_ERROR, 'Failed to login');
   }
 });
 
