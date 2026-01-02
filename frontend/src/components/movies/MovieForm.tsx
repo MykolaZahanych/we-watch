@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface MovieFormProps {
   movie?: Movie;
@@ -70,15 +69,14 @@ export default function MovieForm({ movie, onSubmit, onCancel }: MovieFormProps)
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{movie ? 'Edit Movie' : 'Add New Movie'}</CardTitle>
-        <CardDescription>
+    <div className="p-6">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">{movie ? 'Edit Movie' : 'Add New Movie'}</h2>
+        <p className="text-sm text-muted-foreground mt-1">
           {movie ? 'Update movie information' : 'Add a new movie to your watchlist'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
               {error}
@@ -158,8 +156,7 @@ export default function MovieForm({ movie, onSubmit, onCancel }: MovieFormProps)
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 
