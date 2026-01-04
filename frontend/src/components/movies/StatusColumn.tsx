@@ -1,23 +1,15 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import type { Movie, MovieStatus } from '@/types';
-import { MovieStatusValues } from '@/types';
 import MovieCard from './MovieCard';
-
-const STATUS_LABELS: Record<MovieStatus, string> = {
-  [MovieStatusValues.NEED_TO_WATCH]: 'Need to Watch',
-  [MovieStatusValues.COMPLETED]: 'Already Watched',
-  [MovieStatusValues.REJECTED]: 'Rejected',
-};
+import { STATUS_LABELS } from '@/utils/movieUtils';
 
 interface StatusColumnProps {
   status: MovieStatus;
   movies: Movie[];
-  onEdit: (movie: Movie) => void;
-  onDelete: (id: number) => void;
 }
 
-export default function StatusColumn({ status, movies, onEdit, onDelete }: StatusColumnProps) {
+export default function StatusColumn({ status, movies }: StatusColumnProps) {
   const movieIds = movies.map((m) => m.id.toString());
   const { setNodeRef, isOver } = useDroppable({
     id: status,
@@ -42,7 +34,7 @@ export default function StatusColumn({ status, movies, onEdit, onDelete }: Statu
             {movies.length === 0 ? (
               <div className='text-center text-muted-foreground text-sm py-8'>Drop movies here</div>
             ) : (
-              movies.map((movie) => <MovieCard key={movie.id} movie={movie} onEdit={onEdit} onDelete={onDelete} />)
+              movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)
             )}
           </div>
         </SortableContext>
@@ -50,4 +42,3 @@ export default function StatusColumn({ status, movies, onEdit, onDelete }: Statu
     </div>
   );
 }
-

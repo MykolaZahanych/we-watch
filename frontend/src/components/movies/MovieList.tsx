@@ -64,15 +64,6 @@ export default function MovieList() {
     loadMovies();
   };
 
-  const handleEdit = (movie: Movie) => {
-    setEditingMovie(movie);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id: number) => {
-    setMovies(movies.filter((m) => m.id !== id));
-  };
-
   const handleCancel = () => {
     setShowForm(false);
     setEditingMovie(undefined);
@@ -167,26 +158,20 @@ export default function MovieList() {
             <StatusColumn
               status={MovieStatusValues.NEED_TO_WATCH}
               movies={filteredMovies.needToWatch}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
             />
             <StatusColumn
               status={MovieStatusValues.COMPLETED}
               movies={filteredMovies.completed}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
             />
             <StatusColumn
               status={MovieStatusValues.REJECTED}
               movies={filteredMovies.rejected}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
             />
           </div>
           <DragOverlay>
             {activeMovie ? (
               <div className='opacity-50'>
-                <MovieCard movie={activeMovie} onEdit={handleEdit} onDelete={handleDelete} />
+                <MovieCard movie={activeMovie} />
               </div>
             ) : null}
           </DragOverlay>
