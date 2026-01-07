@@ -14,6 +14,7 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   movies       Movie[]
+  profile      Profile?
 
   @@index([email])
   @@map("users")
@@ -33,6 +34,7 @@ model Movie {
   rating    Int?        @db.SmallInt
   status    MovieStatus
   userId    Int         @map("user_id")
+  selectedBy String     @map("selected_by") @db.VarChar(100)
   createdAt DateTime    @default(now()) @map("created_at")
   updatedAt DateTime    @updatedAt @map("updated_at")
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -40,5 +42,18 @@ model Movie {
   @@index([userId])
   @@index([status])
   @@map("movies")
+}
+
+model Profile {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique @map("user_id")
+  additionalInfo String? @map("additional_info") @db.Text
+  members       String[] @db.VarChar(100)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("profiles")
 }
 

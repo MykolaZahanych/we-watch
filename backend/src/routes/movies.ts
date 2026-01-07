@@ -55,7 +55,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.post('/', async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
-    const { name, link, comments, rating, status } = req.body;
+    const { name, link, comments, rating, status, selectedBy } = req.body;
 
     if (!name || name.trim() === '') {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Movie name is required');
@@ -77,6 +77,10 @@ router.post('/', async (req: Request, res: Response) => {
         `Status is required and must be one of: ${VALID_MOVIE_STATUSES.join(', ')}`);
     }
 
+    if (!selectedBy || selectedBy.trim() === '') {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Selected by is required');
+    }
+
     const movie = await prisma.movie.create({
       data: {
         name: name.trim(),
@@ -84,6 +88,7 @@ router.post('/', async (req: Request, res: Response) => {
         comments: comments?.trim() || null,
         rating: rating !== undefined && rating !== null ? parseInt(rating) : null,
         status,
+        selectedBy: selectedBy.trim(),
         userId,
       },
     });
@@ -99,7 +104,7 @@ router.put('/:id', async (req: Request, res: Response) => {
   try {
     const userId = req.user!.userId;
     const movieId = parseInt(req.params.id);
-    const { name, link, comments, rating, status } = req.body;
+    const { name, link, comments, rating, status, selectedBy } = req.body;
 
     if (isNaN(movieId)) {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Invalid movie ID');
@@ -130,6 +135,11 @@ router.put('/:id', async (req: Request, res: Response) => {
         `Invalid status. Must be one of: ${VALID_MOVIE_STATUSES.join(', ')}`);
     }
 
+    // Validate selectedBy if provided
+    if (selectedBy !== undefined && (!selectedBy || selectedBy.trim() === '')) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Selected by cannot be empty');
+    }
+
     const movie = await prisma.movie.update({
       where: { id: movieId },
       data: {
@@ -138,6 +148,7 @@ router.put('/:id', async (req: Request, res: Response) => {
         ...(comments !== undefined && { comments: comments?.trim() || null }),
         ...(rating !== undefined && { rating: rating !== null ? parseInt(rating) : null }),
         ...(status !== undefined && status !== null && { status }),
+        ...(selectedBy !== undefined && { selectedBy: selectedBy.trim() }),
       },
     });
 
