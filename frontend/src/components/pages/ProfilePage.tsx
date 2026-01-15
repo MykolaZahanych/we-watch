@@ -8,9 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/layout/Layout';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,6 +73,10 @@ export default function ProfilePage() {
       const updatedProfile = await profileApi.update(updateData);
       setProfile(updatedProfile);
       setError(null);
+      toast({
+        variant: 'success',
+        title: 'Profile updated successfully',
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update profile');
     } finally {
