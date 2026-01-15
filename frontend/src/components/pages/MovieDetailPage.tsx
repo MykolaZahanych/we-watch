@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { moviesApi } from '@/api';
-import { linkPreviewApi } from '@/api/linkPreview';
 import type { Movie, CreateMovieData, UpdateMovieData } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieForm from '@/components/movies/MovieForm';
 import Layout from '@/components/layout/Layout';
+import { useMovieImage } from '@/hooks/use-movie-image';
 import { STATUS_LABELS, STATUS_COLORS, getLinkPreview } from '@/utils/movieUtils';
 
 export default function MovieDetailPage() {
@@ -15,9 +15,9 @@ export default function MovieDetailPage() {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  
+  const { previewImage, imageError, setImageError } = useMovieImage(movie?.link || null, movie?.previewImageUrl || null);
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -41,19 +41,6 @@ export default function MovieDetailPage() {
 
     loadMovie();
   }, [id]);
-
-  useEffect(() => {
-    const fetchPreview = async () => {
-      if (!movie?.link) return;
-
-      const imageUrl = await linkPreviewApi.getImage(movie.link);
-      if (imageUrl) {
-        setPreviewImage(imageUrl);
-      }
-    };
-
-    fetchPreview();
-  }, [movie?.link]);
 
   const handleDelete = async () => {
     if (!movie || !confirm('Are you sure you want to delete this movie?')) {
@@ -152,7 +139,7 @@ export default function MovieDetailPage() {
                     {STATUS_LABELS[movie.status]}
                   </span>
                   {movie.rating !== null && <span className='text-lg text-muted-foreground'>⭐ {movie.rating}/10</span>}
-                  <div className='text-sm text-muted-foreground mb-0 ml-auto'>
+                  <div className='text-base mb-0 ml-auto'>
                     Selected by: <span className='font-extrabold'>{movie.selectedBy}</span>
                   </div>
                 </div>
@@ -164,6 +151,7 @@ export default function MovieDetailPage() {
                     src={previewImage}
                     alt={movie.name}
                     className='w-full h-auto max-h-96 object-contain'
+                    loading='lazy'
                     onError={() => setImageError(true)}
                   />
                 </div>

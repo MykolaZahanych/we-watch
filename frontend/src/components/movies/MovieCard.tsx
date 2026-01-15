@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Movie } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { linkPreviewApi } from '@/api/linkPreview';
+import { useMovieImage } from '@/hooks/use-movie-image';
 import { STATUS_LABELS, STATUS_COLORS, getLinkPreview } from '@/utils/movieUtils';
 
 interface MovieCardProps {
@@ -13,22 +12,7 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ movie }: MovieCardProps) {
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    const fetchPreview = async () => {
-      if (!movie.link) return;
-
-      const imageUrl = await linkPreviewApi.getImage(movie.link);
-      if (imageUrl) {
-        setPreviewImage(imageUrl);
-      }
-    };
-
-    fetchPreview();
-  }, [movie.link]);
-
+  const { previewImage, imageError, setImageError } = useMovieImage(movie.link, movie.previewImageUrl);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: movie.id.toString(),
     data: {
@@ -69,6 +53,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                   src={previewImage}
                   alt={movie.name}
                   className='w-full h-auto max-h-52 object-contain'
+                  loading='lazy'
                   onError={() => setImageError(true)}
                 />
               </div>

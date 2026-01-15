@@ -27,20 +27,22 @@ enum MovieStatus {
 }
 
 model Movie {
-  id        Int         @id @default(autoincrement())
-  name      String      @db.VarChar(255)
-  link      String      @db.Text
-  comments  String?     @db.Text
-  rating    Int?        @db.SmallInt
-  status    MovieStatus
-  userId    Int         @map("user_id")
-  selectedBy String     @map("selected_by") @db.VarChar(100)
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             Int          @id @default(autoincrement())
+  name           String       @db.VarChar(255)
+  link           String       @db.Text
+  previewImageUrl String?     @map("preview_image_url") @db.Text
+  comments       String?      @db.Text
+  rating         Int?         @db.SmallInt
+  status         MovieStatus
+  userId         Int          @map("user_id")
+  selectedBy     String       @map("selected_by") @db.VarChar(100)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
+  @@index([link])
   @@map("movies")
 }
 

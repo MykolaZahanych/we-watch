@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '@db/client.js';
 import { authenticateToken } from '@middleware/auth.js';
 import { VALID_MOVIE_STATUSES, isValidMovieStatus } from '@constants/movies.js';
+import { fetchLinkPreviewImage } from '@utils/linkPreview.js';
 import { sendErrorResponse, HttpStatus } from '@utils/response.js';
 
 const router = Router();
@@ -81,10 +82,34 @@ router.post('/', async (req: Request, res: Response) => {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Selected by is required');
     }
 
+    const trimmedLink = link.trim();
+    // Fetch preview image URL (non-blocking, don't fail if it fails)
+    let previewImageUrl: string | null = null;
+    try {
+      const existingMovie = await prisma.movie.findFirst({
+        where: {
+          link: trimmedLink,
+          previewImageUrl: { not: null },
+        },
+        select: {
+          previewImageUrl: true,
+        },
+      });
+
+      if (existingMovie?.previewImageUrl) {
+        previewImageUrl = existingMovie.previewImageUrl;
+      } else {
+        previewImageUrl = await fetchLinkPreviewImage(trimmedLink);
+      }
+    } catch (error) {
+      console.warn('Failed to fetch preview image:', error);
+    }
+
     const movie = await prisma.movie.create({
       data: {
         name: name.trim(),
-        link: link.trim(),
+        link: trimmedLink,
+        previewImageUrl,
         comments: comments?.trim() || null,
         rating: rating !== undefined && rating !== null ? parseInt(rating) : null,
         status,
@@ -140,11 +165,38 @@ router.put('/:id', async (req: Request, res: Response) => {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Selected by cannot be empty');
     }
 
+    // If link is being updated, fetch preview image
+    let previewImageUrl: string | null | undefined = undefined;
+    if (link !== undefined) {
+      const trimmedLink = link.trim();
+      try {
+        const existingMovie = await prisma.movie.findFirst({
+          where: {
+            link: trimmedLink,
+            previewImageUrl: { not: null },
+            id: { not: movieId }, // Don't check the current movie
+          },
+          select: {
+            previewImageUrl: true,
+          },
+        });
+
+        if (existingMovie?.previewImageUrl) {
+          previewImageUrl = existingMovie.previewImageUrl;
+        } else {
+          previewImageUrl = await fetchLinkPreviewImage(trimmedLink);
+        }
+      } catch (error) {
+        previewImageUrl = null;
+      }
+    }
+
     const movie = await prisma.movie.update({
       where: { id: movieId },
       data: {
         ...(name !== undefined && { name: name.trim() }),
         ...(link !== undefined && { link: link.trim() }),
+        ...(previewImageUrl !== undefined && { previewImageUrl }),
         ...(comments !== undefined && { comments: comments?.trim() || null }),
         ...(rating !== undefined && { rating: rating !== null ? parseInt(rating) : null }),
         ...(status !== undefined && status !== null && { status }),

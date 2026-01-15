@@ -10,6 +10,7 @@ export interface Movie {
   id: number;
   name: string;
   link: string;
+  previewImageUrl: string | null;
   comments: string | null;
   rating: number | null;
   status: MovieStatus;
