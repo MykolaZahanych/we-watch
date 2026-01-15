@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { profileApi } from '@/api';
 import type { Profile, UpdateProfileData } from '@/types';
@@ -54,6 +54,22 @@ export default function ProfilePage() {
       setError('At least one member is required');
     }
   };
+
+  const hasChanges = useMemo(() => {
+    if (!profile) return false;
+
+    const current = {
+      additionalInfo: additionalInfo.trim(),
+      members: [...members].sort(),
+    };
+
+    const original = {
+      additionalInfo: (profile.additionalInfo || '').trim(),
+      members: [...profile.members].sort(),
+    };
+
+    return JSON.stringify(current) !== JSON.stringify(original);
+  }, [additionalInfo, members, profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,7 +207,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button type="submit" disabled={isSubmitting} className="flex-1">
+                <Button type="submit" disabled={isSubmitting || !hasChanges} className="flex-1">
                   {isSubmitting ? 'Saving...' : 'Save Profile'}
                 </Button>
                 <Button
