@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { User, LogOut } from 'lucide-react';
 import { removeAuthToken } from '@/api';
 import { Button } from '@/components/ui/button';
 
@@ -22,9 +23,18 @@ export default function Header({ onLogout }: HeaderProps) {
               - your shared movie watchlist app
             </span>
           </Link>
-          <Button onClick={handleLogout} variant="outline">
-            Logout
-          </Button>
+          <div className="flex items-center gap-8">
+            <Link to="/profile">
+              <Button variant="outline" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Profile
+              </Button>
+            </Link>
+            <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     </header>

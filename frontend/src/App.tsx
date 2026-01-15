@@ -4,6 +4,7 @@ import PublicRoute from '@/components/PublicRoute';
 import LoginPage from '@/components/pages/LoginPage';
 import HomePage from '@/components/pages/HomePage';
 import MovieDetailPage from '@/components/pages/MovieDetailPage';
+import ProfilePage from '@/components/pages/ProfilePage';
 import NotFound from '@/components/pages/NotFound';
 
 function App() {
@@ -31,6 +32,14 @@ function App() {
           element={
             <ProtectedRoute>
               <MovieDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

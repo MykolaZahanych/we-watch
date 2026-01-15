@@ -47,9 +47,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card className='cursor-grab active:cursor-grabbing'>
         <CardContent className='p-4 space-y-3'>
-          <div className='font-semibold text-base'>
-            {movie.name}
-          </div>
+          <div className='font-semibold text-base'>{movie.name}</div>
 
           <div className='flex items-center justify-between'>
             <span className={`px-2 py-1 text-xs font-medium rounded border ${STATUS_COLORS[movie.status]}`}>
@@ -78,12 +76,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
             <div className='text-sm text-blue-600 hover:underline mt-2'>🔗 {getLinkPreview(movie.link)}</div>
           </a>
 
+          <div className='text-sm text-muted-foreground mb-0'>
+            Selected by: <span className='font-medium'>{movie.selectedBy}</span>
+          </div>
+
           <div className='flex items-center justify-between'>
             <p className='text-xs text-muted-foreground'>Added {new Date(movie.createdAt).toLocaleDateString()}</p>
-            <Link
-              to={`/movies/${movie.id}`}
-              onClick={(e) => e.stopPropagation()}
-            >
+            <Link to={`/movies/${movie.id}`} onClick={(e) => e.stopPropagation()}>
               <Button variant='outline' size='sm'>
                 More
               </Button>

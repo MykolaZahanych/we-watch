@@ -35,6 +35,14 @@ export async function apiRequest<T>(
   const data = await response.json();
 
   if (!response.ok) {
+    // Don't redirect for auth endpoints (login/register) - let them handle errors
+    const isAuthEndpoint = endpoint.startsWith('/auth/');
+    
+    if ((response.status === 401 || response.status === 403) && !isAuthEndpoint) {
+      removeAuthToken();
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired'));
+    }
     throw new Error(data.error);
   }
 

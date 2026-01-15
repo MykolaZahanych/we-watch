@@ -47,7 +47,6 @@ router.post('/register', async (req: Request, res: Response) => {
     const saltRounds = 16;
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
-    // Create user with profile (profile is required for the app to work)
     const user = await prisma.user.create({
       data: {
         email,

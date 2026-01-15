@@ -13,6 +13,7 @@ export interface Movie {
   comments: string | null;
   rating: number | null;
   status: MovieStatus;
+  selectedBy: string;
   userId: number;
   createdAt: string;
   updatedAt: string;
@@ -24,6 +25,7 @@ export interface CreateMovieData {
   comments?: string;
   rating?: number;
   status: MovieStatus;
+  selectedBy: string;
 }
 
 export type UpdateMovieData = Partial<CreateMovieData>;
