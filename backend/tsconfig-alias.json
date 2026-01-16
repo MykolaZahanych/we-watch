@@ -1,0 +1,11 @@
+{
+  "resolveFullPaths": true,
+  "replacers": {
+    "@utils/*": ["src/utils/*"],
+    "@db/*": ["src/db/*"],
+    "@routes/*": ["src/routes/*"],
+    "@middleware/*": ["src/middleware/*"],
+    "@constants/*": ["src/constants/*"],
+    "@types/*": ["src/types/*"]
+  }
+}

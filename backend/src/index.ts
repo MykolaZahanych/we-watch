@@ -14,13 +14,15 @@ dotenv.config();
 validateEnv();
 
 const app = express();
-const PORT = parseInt(process.env.PORT!, 10);
+const PORT = parseInt(process.env.PORT || '5001', 10);
 
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? process.env.FRONTEND_URL
     : true,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 const generalLimiter = rateLimit({

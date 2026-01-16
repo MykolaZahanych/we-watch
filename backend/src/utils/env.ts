@@ -3,7 +3,11 @@
  * Exits the process if any required variables are missing
  */
 export function validateEnv(): void {
-  const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL', 'PORT', 'NODE_ENV'];
+  const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL', 'NODE_ENV'];
+  
+  if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
+    requiredEnvVars.push('FRONTEND_URL');
+  }
 
   const missing: string[] = [];
 

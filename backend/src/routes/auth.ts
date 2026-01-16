@@ -4,6 +4,7 @@ import { prisma } from '@db/client.js';
 import { generateToken } from '@utils/jwt.js';
 import { sendErrorResponse, HttpStatus } from '@utils/response.js';
 
+const MAX_USERS = 1;
 const router = Router();
 
 router.post('/register', async (req: Request, res: Response) => {
@@ -53,6 +54,15 @@ router.post('/register', async (req: Request, res: Response) => {
 
     if (existingUser) {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'User with this email already exists');
+    }
+
+    const userCount = await prisma.user.count();
+    if (userCount >= MAX_USERS) {
+      return sendErrorResponse(
+        res,
+        HttpStatus.FORBIDDEN,
+        `Registration is currently limited to ${MAX_USERS} users. Maximum number of accounts reached.`
+      );
     }
 
     // Hash password
