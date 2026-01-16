@@ -62,8 +62,23 @@ router.post('/', async (req: Request, res: Response) => {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Movie name is required');
     }
 
+    if (name.length > 255) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Movie name is too long (max 255 characters)');
+    }
+
     if (!link || link.trim() === '') {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Movie link is required');
+    }
+
+    if (link.length > 2048) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Movie link is too long (max 2048 characters)');
+    }
+
+    // Validate URL format
+    try {
+      new URL(link.trim());
+    } catch {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Invalid URL format');
     }
 
     if (rating !== undefined && rating !== null) {

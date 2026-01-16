@@ -34,6 +34,18 @@ router.post('/register', async (req: Request, res: Response) => {
       return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Invalid email format');
     }
 
+    if (email.length > 64) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Email is too long');
+    }
+
+    if (nickname.length > 64) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Nickname is too long (max 100 characters)');
+    }
+
+    if (password.length > 24) {
+      return sendErrorResponse(res, HttpStatus.BAD_REQUEST, 'Password is too long');
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },

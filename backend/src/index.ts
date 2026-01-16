@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import authRouter from '@routes/auth.js';
 import moviesRouter from '@routes/movies.js';
 import linkPreviewRouter from '@routes/linkPreview.js';
@@ -15,15 +16,36 @@ validateEnv();
 const app = express();
 const PORT = parseInt(process.env.PORT!, 10);
 
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.FRONTEND_URL
+    : true,
+  credentials: true,
+};
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.',
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5,
+  message: 'Too many authentication attempts, please try again later.',
+  skipSuccessfulRequests: true,
+});
+
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+app.use(generalLimiter);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'We Watch API is running' });
 });
 
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authLimiter, authRouter);
 app.use('/api/movies', moviesRouter);
 app.use('/api/link-preview', linkPreviewRouter);
 app.use('/api/profile', profileRouter);
